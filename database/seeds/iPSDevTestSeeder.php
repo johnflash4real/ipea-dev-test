@@ -17,17 +17,20 @@ class iPSDevTestSeeder extends Seeder
             Module::insert([
                 [
                     'course_key' => 'ipa',
-                    'name' => 'IPA Module ' . $i
+                    'name' => 'IPA Module ' . $i,
+                    'position'=>$i
                 ],
 
                 [
                     'course_key' => 'iea',
-                    'name' => 'IEA Module ' . $i
+                    'name' => 'IEA Module ' . $i,
+                    'position'=>$i
                 ],
 
                 [
                     'course_key' => 'iaa',
-                    'name' => 'IAA Module ' . $i
+                    'name' => 'IAA Module ' . $i,
+                    'position'=>$i
                 ]
             ]);
         }

@@ -37,16 +37,36 @@ class ApiController extends Controller
         $user = User::where('email',$userEmail)->with('completed_modules')->first();
         if(!$user) return response()->json(['success'=>false,'message'=>'user not found'],404);
 
-        $tags = $this->getTags();
-
-        //fetch user's modules
-        //$userCompletedModules = $user->completed_modules;
+        //$tags = $this->getTags();
 
 
+        $contact = $infusionsoftHelper->getContact($userEmail);
+        $contactCourses = explode(",",$contact['_Products']);
+
+        //by default user has no pending module till one is found
+        $nextModule = null;
+        foreach ($contactCourses as $contactCourse ){
+            $pendingModule = $user->getNextPendingModule($contactCourse);
+            if($pendingModule){
+                $nextModule = $pendingModule;
+                break;
+            }
+        }
 
 
-        return response()->json(['success'=>true,'message'=>'ok','user'=>$user,'tags'=>$tags]);
+
+
+
+
+
+
+
+
+
+        return response()->json(['success'=>true,'message'=>'ok','user'=>$user,'next'=>$nextModule]);
     }
+
+
 
 
     //check db for tags or fetch from api then save in db

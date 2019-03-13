@@ -17,6 +17,7 @@ class CreateModulesTable extends Migration
             $table->increments('id');
             $table->string('course_key');
             $table->string('name');
+            $table->integer('position',false,true);
             $table->timestamps();
         });
 
@@ -41,7 +42,7 @@ class CreateModulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_modules');
+        Schema::dropIfExists('user_completed_modules');
         Schema::dropIfExists('modules');
     }
 }

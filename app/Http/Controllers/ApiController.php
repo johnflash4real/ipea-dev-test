@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Response;
 
 class ApiController extends Controller
@@ -12,10 +13,27 @@ class ApiController extends Controller
 
     /**
      * Module reminder Assigner => Assigns reminders to user profile based on module progress
+     *
+     * @param Request $request
+     * @param InfusionsoftHelper $infusionsoftHelper
+     * @return Response
      */
 
-    public function moduleReminderAssigner(){
-        return ['ok'=>'1'];
+    public function moduleReminderAssigner(Request $request, InfusionsoftHelper $infusionsoftHelper){
+
+        //validate contact email parameter
+        $request->validate([
+            'contact_email'=>'required|email'
+        ]);
+
+        //get contact with email or return failure response
+        $userEmail = $request->input('contact_email');
+
+
+
+
+
+        return response()->json(['success'=>true,'message'=>'ok','contact'=>$userEmail]);
     }
 
     private function exampleCustomer(){

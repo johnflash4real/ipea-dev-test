@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use \App\User;
@@ -37,9 +38,8 @@ class ApiController extends Controller
         $user = User::where('email',$userEmail)->with('completed_modules')->first();
         if(!$user) return response()->json(['success'=>false,'message'=>'user not found'],404);
 
-        //$tags = $this->getTags();
 
-
+        //get user's associated contact from infusion soft
         $contact = $infusionsoftHelper->getContact($userEmail);
         $contactCourses = explode(",",$contact['_Products']);
 
@@ -49,11 +49,12 @@ class ApiController extends Controller
             $pendingModule = $user->getNextPendingModule($contactCourse);
             if($pendingModule){
                 $nextModule = $pendingModule;
-                break;
+                break; //stop looking any further once a pending module is found
             }
         }
 
 
+        $tagToAdd = $this->getTagForModule($nextModule);
 
 
 
@@ -62,18 +63,35 @@ class ApiController extends Controller
 
 
 
+        return response()->json(['success'=>true,'message'=>'ok','user'=>$user,'next'=>$nextModule,'tag'=>$tagToAdd]);
+    }
 
-        return response()->json(['success'=>true,'message'=>'ok','user'=>$user,'next'=>$nextModule]);
+
+    /**
+     * Get start reminder tag for specific module or when no module
+     * @param Module $module
+     * @return Tag
+     */
+
+    private function getTagForModule(Module $module=null){
+        //build proper tag slug
+        if($module) $tagSlug = "start-{$module->course_key}-module-{$module->position}-reminders";
+        else $tagSlug = "module-reminders-completed";
+
+        $this->preloadTags(); //ensure we have tags on our db
+        $theTag = Tag::where('slug',$tagSlug)->first();
+        return $theTag;
     }
 
 
 
+    /**
+     * Check db for tags or fetch from api then save in db
+     *
+     */
 
-    //check db for tags or fetch from api then save in db
-    private function getTags(){
-        $tags = Tag::all(); //load all from db
-
-        if(count($tags)==0){
+    private function preloadTags(){
+        if(Tag::all()->count()==0){
             //if no tag in db, load into db from infusionsoft
             $infusionsoftHelper = new InfusionsoftHelper();
             $allTags = $infusionsoftHelper->getAllTags()->all();
@@ -87,10 +105,7 @@ class ApiController extends Controller
                 ];
 
             Tag::insert($tagsArray);
-            $tags = Tag::all();
         }
-
-        return $tags;
     }
 
     /**

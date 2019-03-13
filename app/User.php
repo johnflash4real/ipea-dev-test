@@ -38,14 +38,25 @@ class User extends Authenticatable
     /**
      * Get the user's next un-completed module for selected course
      *
+     * Uses position column to determine next course as desired
+     *
      * @param $courseKey
      * @return Module|Null
      */
     public function getNextPendingModule($courseKey){
 
-        $pendingModules = \App\Module::where('course_key',$courseKey)->whereDoesntHave('users_completed',function ($query){
-            $query->where('users.id',$this->id);
-        })->orderBy('name')->first();
+        $lastCompletedPosition = 0;
+
+        $completedCourseModules = $this->completed_modules()->where('course_key',$courseKey);
+        if($completedCourseModules->count()>0)
+            $lastCompletedPosition = $completedCourseModules->max('position');
+
+        $pendingModules = \App\Module::where('course_key',$courseKey)
+            ->where('position','>',$lastCompletedPosition)
+            ->whereDoesntHave('users_completed',function ($query){
+                $query->where('users.id',$this->id);
+            })
+            ->orderBy('position')->first();
 
         return $pendingModules;
     }

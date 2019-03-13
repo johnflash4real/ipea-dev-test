@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
+use App\Services\TagService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -23,10 +24,11 @@ class ApiController extends Controller
      *
      * @param Request $request
      * @param InfusionsoftHelper $infusionsoftHelper
+     * @param TagService $tagService
      * @return Response
      */
 
-    public function moduleReminderAssigner(Request $request, InfusionsoftHelper $infusionsoftHelper){
+    public function moduleReminderAssigner(Request $request, InfusionsoftHelper $infusionsoftHelper, TagService $tagService){
 
         //validate contact email parameter
         $request->validate([
@@ -55,57 +57,19 @@ class ApiController extends Controller
 
 
         //finally add the tag
-        $tagToAdd = $this->getTagForModule($nextModule);
+        $tagToAdd = $tagService->getTagForModule($nextModule);
         $success = $infusionsoftHelper->addTag($contact['Id'],$tagToAdd->tag_id);
 
 
         return response()->json([
             'success'=>$success,
-            'message'=>"Tag {$tagToAdd->name} added to $userEmail successfully"
+            'message'=>$success?"Tag {$tagToAdd->name} added to $userEmail successfully":"Adding Tag {$tagToAdd->name} to $userEmail failed"
         ]);
     }
 
 
-    /**
-     * Get start reminder tag for specific module or when no module
-     * @param Module $module
-     * @return Tag
-     */
-
-    private function getTagForModule(Module $module=null){
-        //build proper tag slug
-        if($module) $tagSlug = "start-{$module->course_key}-module-{$module->position}-reminders";
-        else $tagSlug = "module-reminders-completed";
-
-        $this->preloadTags(); //ensure we have tags on our db
-        $theTag = Tag::where('slug',$tagSlug)->first();
-        return $theTag;
-    }
 
 
-
-    /**
-     * Check db for tags or fetch from api then save in db
-     *
-     */
-
-    private function preloadTags(){
-        if(Tag::all()->count()==0){
-            //if no tag in db, load into db from infusionsoft
-            $infusionsoftHelper = new InfusionsoftHelper();
-            $allTags = $infusionsoftHelper->getAllTags()->all();
-            $tagsArray = [];
-
-            foreach ($allTags as $tag)
-                $tagsArray[] = [
-                    'tag_id'=>$tag->id,
-                    'name'=>$tag->name,
-                    'slug'=>str_slug($tag->name) //give each tag a slug for easily finding it later
-                ];
-
-            Tag::insert($tagsArray);
-        }
-    }
 
     /**
      * create fake user utilizing helper function

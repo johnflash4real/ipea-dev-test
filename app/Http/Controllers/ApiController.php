@@ -30,12 +30,14 @@ class ApiController extends Controller
 
         //get contact with email or return failure response
         $userEmail = $request->input('contact_email');
+        $user = User::where('email',$userEmail)->first();
+        if(!$user) return response()->json(['success'=>false,'message'=>'user not found'],404);
 
 
 
 
 
-        return response()->json(['success'=>true,'message'=>'ok','contact'=>$userEmail]);
+        return response()->json(['success'=>true,'message'=>'ok','user'=>$user]);
     }
 
     /**

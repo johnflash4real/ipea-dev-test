@@ -2,8 +2,10 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class User extends Authenticatable
 {
@@ -30,5 +32,21 @@ class User extends Authenticatable
     public function completed_modules()
     {
         return $this->belongsToMany('App\Module', 'user_completed_modules');
+    }
+
+
+    /**
+     * Get the user's next un-completed module for selected course
+     *
+     * @param $courseKey
+     * @return Module|Null
+     */
+    public function getNextPendingModule($courseKey){
+
+        $pendingModules = \App\Module::where('course_key',$courseKey)->whereDoesntHave('users_completed',function ($query){
+            $query->where('id',$this->id);
+        })->first();
+
+        return $pendingModules;
     }
 }

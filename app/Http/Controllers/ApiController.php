@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Helpers\InfusionsoftHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use \App\User;
+use \App\Module;
 use Response;
 
 class ApiController extends Controller
@@ -34,6 +36,16 @@ class ApiController extends Controller
 
 
         return response()->json(['success'=>true,'message'=>'ok','contact'=>$userEmail]);
+    }
+
+    /**
+     * create fake user utilizing helper function
+     * @return Response
+     */
+
+    public function createFakeUser(){
+        $user = $this->exampleCustomer();
+        return $user;
     }
 
     private function exampleCustomer(){

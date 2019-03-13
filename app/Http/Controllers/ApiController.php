@@ -56,7 +56,7 @@ class ApiController extends Controller
 
         //finally add the tag
         $tagToAdd = $this->getTagForModule($nextModule);
-        $success = $infusionsoftHelper->addTag($contact['ID'],$tagToAdd->tag_id);
+        $success = $infusionsoftHelper->addTag($contact['Id'],$tagToAdd->tag_id);
 
 
         return response()->json([

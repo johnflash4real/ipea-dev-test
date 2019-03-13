@@ -10,6 +10,14 @@ class ApiController extends Controller
 {
     // Todo: Module reminder assigner
 
+    /**
+     * Module reminder Assigner => Assigns reminders to user profile based on module progress
+     */
+
+    public function moduleReminderAssigner(){
+        return ['ok'=>'1'];
+    }
+
     private function exampleCustomer(){
 
         $infusionsoft = new InfusionsoftHelper();

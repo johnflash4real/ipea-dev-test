@@ -45,7 +45,7 @@ class User extends Authenticatable
 
         $pendingModules = \App\Module::where('course_key',$courseKey)->whereDoesntHave('users_completed',function ($query){
             $query->where('id',$this->id);
-        })->first();
+        })->orderBy('name')->first();
 
         return $pendingModules;
     }

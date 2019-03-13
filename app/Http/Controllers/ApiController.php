@@ -58,9 +58,13 @@ class ApiController extends Controller
             $infusionsoftHelper = new InfusionsoftHelper();
             $allTags = $infusionsoftHelper->getAllTags()->all();
             $tagsArray = [];
-            $now = Carbon::now()->toDateTimeString();
+
             foreach ($allTags as $tag)
-                $tagsArray[] = ['tag_id'=>$tag->id,'name'=>$tag->name,'created_at'=>$now,'updated_at'=>$now];
+                $tagsArray[] = [
+                    'tag_id'=>$tag->id,
+                    'name'=>$tag->name,
+                    'slug'=>str_slug($tag->name) //give each tag a slug for easily finding it later
+                ];
 
             Tag::insert($tagsArray);
             $tags = Tag::all();

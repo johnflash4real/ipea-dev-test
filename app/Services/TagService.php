@@ -9,7 +9,7 @@
 namespace App\Services;
 
 use  App\Http\Helpers\InfusionsoftHelper;
-use \App\Module;
+use App\Module;
 use App\Tag;
 
 class TagService

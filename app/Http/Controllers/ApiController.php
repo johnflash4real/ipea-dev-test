@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
 use App\Services\TagService;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use \App\User;
 use \App\Module;
-use App\Tag;
 use Response;
 
 class ApiController extends Controller
@@ -35,9 +33,9 @@ class ApiController extends Controller
             'contact_email'=>'required|email'
         ]);
 
-        //get contact with email or return failure response
+        //get user with email or return failure response
         $userEmail = $request->input('contact_email');
-        $user = User::where('email',$userEmail)->with('completed_modules')->first();
+        $user = User::where('email',$userEmail)->first();
         if(!$user) return response()->json(['success'=>false,'message'=>'user not found'],404);
 
 
@@ -63,7 +61,7 @@ class ApiController extends Controller
 
         return response()->json([
             'success'=>$success,
-            'message'=>$success?"Tag {$tagToAdd->name} added to $userEmail successfully":"Adding Tag {$tagToAdd->name} to $userEmail failed"
+            'message'=>$success?"Tag '{$tagToAdd->name}' added to $userEmail successfully":"Could not add Tag '{$tagToAdd->name}' to $userEmail"
         ]);
     }
 

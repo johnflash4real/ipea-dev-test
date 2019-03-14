@@ -15,6 +15,16 @@ class ApiController extends Controller
 {
     // Todo: Module reminder assigner
 
+    protected $tagService; //For everything tags
+    protected $infusionSoftHelper;
+
+
+    public function __construct(TagService $tagService, InfusionsoftHelper $infusionsoftHelper)
+    {
+        $this->tagService = $tagService;
+        $this->infusionSoftHelper = $infusionsoftHelper;
+    }
+
     /**
      * Module reminder Assigner
      *
@@ -26,7 +36,7 @@ class ApiController extends Controller
      * @return Response
      */
 
-    public function moduleReminderAssigner(Request $request, InfusionsoftHelper $infusionsoftHelper, TagService $tagService){
+    public function moduleReminderAssigner(Request $request){
 
         //validate contact email parameter
         $request->validate([
@@ -40,7 +50,7 @@ class ApiController extends Controller
 
 
         //get user's associated contact from infusion soft
-        $contact = $infusionsoftHelper->getContact($userEmail);
+        $contact = $this->infusionSoftHelper->getContact($userEmail);
         $contactCourses = explode(",",$contact['_Products']);
 
         //by default user has no pending module till one is found
@@ -55,14 +65,15 @@ class ApiController extends Controller
 
 
         //finally add the tag
-        $tagToAdd = $tagService->getTagForModule($nextModule);
-        $success = $infusionsoftHelper->addTag($contact['Id'],$tagToAdd->tag_id);
+        $tagToAdd = $this->tagService->getTagForModule($nextModule);
+        $success = $this->infusionSoftHelper->addTag($contact['Id'],$tagToAdd->tag_id);
 
 
         return response()->json([
             'success'=>$success,
             'message'=>$success?"Tag '{$tagToAdd->name}' added to $userEmail successfully":"Could not add Tag '{$tagToAdd->name}' to $userEmail"
-        ]);
+        ],201);
+
     }
 
 
@@ -81,11 +92,9 @@ class ApiController extends Controller
 
     private function exampleCustomer(){
 
-        $infusionsoft = new InfusionsoftHelper();
-
         $uniqid = uniqid();
 
-        $infusionsoft->createContact([
+        $this->infusionSoftHelper->createContact([
             'Email' => $uniqid.'@test.com',
             "_Products" => 'ipa,iea'
         ]);

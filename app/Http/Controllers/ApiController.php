@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Helpers\InfusionsoftHelper;
 use App\Services\TagService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use \App\User;
@@ -31,17 +32,19 @@ class ApiController extends Controller
      * Assigns reminders to user profile based on module progress
      *
      * @param Request $request
-     * @param InfusionsoftHelper $infusionsoftHelper
-     * @param TagService $tagService
      * @return Response
      */
 
     public function moduleReminderAssigner(Request $request){
 
         //validate contact email parameter
-        $request->validate([
+        //ideally, i would place this in another class, but lets keep things simple...
+
+        $validator = Validator::make($request->all(), [
             'contact_email'=>'required|email'
         ]);
+        if ($validator->fails()) return response()->json(['success'=>false,'message'=>$validator->errors()->get('contact_email')[0]]);
+
 
         //get user with email or return failure response
         $userEmail = $request->input('contact_email');

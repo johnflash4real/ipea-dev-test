@@ -43,7 +43,7 @@ class ApiController extends Controller
         $validator = Validator::make($request->all(), [
             'contact_email'=>'required|email'
         ]);
-        if ($validator->fails()) return response()->json(['success'=>false,'message'=>$validator->errors()->get('contact_email')[0]]);
+        if ($validator->fails()) return response()->json(['success'=>false,'message'=>$validator->errors()->get('contact_email')[0]],422);
 
 
         //get user with email or return failure response

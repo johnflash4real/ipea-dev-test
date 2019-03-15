@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\User;
+use phpDocumentor\Reflection\Types\Integer;
 use PhpParser\Node\Expr\Array_;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -54,6 +56,8 @@ class ModuleReminderAssignerTest extends TestCase
 
     /**
      * Helper to init mockers
+     * @param User $user
+     * @param int $expectedTagId
      */
     private function initMockers($user,$expectedTagId){
 
@@ -249,6 +253,64 @@ class ModuleReminderAssignerTest extends TestCase
 
 
         $this->initMockers($user,126);
+
+        $this->post(route('module_reminder'),['contact_email'=>$user->email])
+            ->assertStatus(201)
+            ->assertJson(['success'=>true]);
+
+
+
+    }
+
+    /**
+     * Test if endpoint will assign IEA Module 6 when user has completed IEA Module 1,2,5 and IPA M1-M7
+     *
+     * @return  void
+     */
+
+
+    public function tests_will_assign_iea_m6_after_iea_m1_m2_m5_ipa_m1_to_m7()
+    {
+
+        $completedModuleIds = array_merge(
+            $this->getModuleIds("ipa",[1,2,3,4,6,7]),
+            $this->getModuleIds("iea",[1,2,5])
+        );
+
+        $user = factory(\App\User::class)->create();
+        $user->completed_modules()->attach($completedModuleIds);
+
+
+        $this->initMockers($user,134);
+
+        $this->post(route('module_reminder'),['contact_email'=>$user->email])
+            ->assertStatus(201)
+            ->assertJson(['success'=>true]);
+
+
+
+    }
+
+    /**
+     * Test if endpoint will assign Modules Reminder Completed when user has completed IEA Module 1,2,5,7 and IPA M1-M7
+     *
+     * @return  void
+     */
+
+
+    public function tests_will_assign_complete_after_iea_m1_m2_m5_m7_ipa_m1_to_m7()
+    {
+
+        $completedModuleIds = array_merge(
+            $this->getModuleIds("ipa",[1,2,3,4,6,7]),
+            $this->getModuleIds("iea",[1,2,5,7])
+        );
+
+        $user = factory(\App\User::class)->create();
+        $user->completed_modules()->attach($completedModuleIds);
+
+
+        $this->initMockers($user,154);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)

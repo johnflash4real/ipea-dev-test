@@ -43,6 +43,8 @@ class ApiController extends Controller
      * @return Response
      */
 
+    //TODO: refactor to further trim down controller
+
     public function moduleReminderAssigner(Request $request){
 
         //validate contact email parameter

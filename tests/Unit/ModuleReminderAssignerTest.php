@@ -3,13 +3,11 @@
 namespace Tests\Unit;
 
 use App\User;
-use phpDocumentor\Reflection\Types\Integer;
-use PhpParser\Node\Expr\Array_;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+
 
 use Infusionsoft\FrameworkSupport\Laravel\InfusionsoftFacade;
 use App\Module;

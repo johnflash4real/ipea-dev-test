@@ -15,5 +15,4 @@ use Illuminate\Http\Request;
 
 Route::post('module_reminder_assigner','ApiController@moduleReminderAssigner')->name('module_reminder');
 
-//custom route for creating fake users
-Route::post('fake_user','ApiController@createFakeUser');
+

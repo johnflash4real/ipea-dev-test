@@ -14,7 +14,7 @@ use Response;
 
 class ApiController extends Controller
 {
-    // Todo: Module reminder assigner
+
 
     protected $tagService; //For everything tags
     protected $infusionSoftHelper;
@@ -83,15 +83,8 @@ class ApiController extends Controller
 
 
 
-    /**
-     * create fake user utilizing helper function
-     * @return Response
-     */
 
-    public function createFakeUser(){
-        $user = $this->exampleCustomer();
-        return $user;
-    }
+    //TODO: decide whether to leave or remove this method.
 
     private function exampleCustomer(){
 

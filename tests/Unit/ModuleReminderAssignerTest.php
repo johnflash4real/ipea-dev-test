@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use Infusionsoft\FrameworkSupport\Laravel\InfusionsoftFacade;
-use Storage;
+
 
 
 class ModuleReminderAssignerTest extends TestCase
@@ -53,7 +53,50 @@ class ModuleReminderAssignerTest extends TestCase
 
 
     /**
-     * Test if endpoint will assign IPA M6 when user has completed IPA Modules 1,2,3 and 5
+     * Test if endpoint will assign IPA Module 4 when user has completed IPA Modules 1,2 and 3
+     *
+     * @return  void
+     */
+
+    public function tests_will_assign_ipa_m4_after_ipa_m1_m2_m3()
+    {
+
+        $user = factory(\App\User::class)->create();
+        $user->completed_modules()->attach([1,4,7]);
+
+        $fields = [
+            'Id',
+            'Email',
+            'Groups',
+            "_Products"
+        ];
+
+        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
+
+        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
+            ->once()->with($user->email,$fields)
+            ->andReturn([
+                ["Email"=> $user->email,
+                "_Products"=>"ipa,iea",
+                "Id"=> 1234]
+            ]);
+
+        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
+            ->once()
+            ->with(1234,116)
+            ->andReturn(true);
+
+        $this->post(route('module_reminder'),['contact_email'=>$user->email])
+            ->assertStatus(201)
+            ->assertJson(['success'=>true]);
+
+
+
+    }
+
+
+    /**
+     * Test if endpoint will assign IPA Module 6 when user has completed IPA Modules 1,2,3 and 5
      *
      * @return  void
      */
@@ -77,8 +120,8 @@ class ModuleReminderAssignerTest extends TestCase
             ->once()->with($user->email,$fields)
             ->andReturn([
                 ["Email"=> $user->email,
-                "_Products"=>"ipa,iea",
-                "Id"=> 1234]
+                    "_Products"=>"ipa,iea",
+                    "Id"=> 1234]
             ]);
 
         InfusionsoftFacade::shouldReceive('contacts->addToGroup')

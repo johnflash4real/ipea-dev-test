@@ -19,6 +19,7 @@ class ReminderAssignerService
      * Get user's next pending module
      *
      * @param User $user
+     * @param array $contact
      * @return Module | null
      */
     public function getUserNextModule(User $user, array $contact){

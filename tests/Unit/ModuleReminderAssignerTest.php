@@ -52,6 +52,27 @@ class ModuleReminderAssignerTest extends TestCase
         return Module::where('course_key',$courseKey)->whereIn('position',$moduleNos)->pluck('id')->toArray();
     }
 
+    /**
+     * Helper to init mockers
+     */
+    private function initMockers($user,$expectedTagId){
+
+        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
+
+        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
+            ->once()->with($user->email,$this->contactFields)
+            ->andReturn([
+                ["Email"=> $user->email,
+                    "_Products"=>"ipa,iea",
+                    "Id"=> 1234]
+            ]);
+
+        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
+            ->once()
+            ->with(1234,$expectedTagId)
+            ->andReturn(true);
+    }
+
     //<-----------end helpers and props------------->
 
 
@@ -98,27 +119,11 @@ class ModuleReminderAssignerTest extends TestCase
         $user = factory(\App\User::class)->create();
         $user->completed_modules()->attach($completedModuleIds);
 
-
-        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
-
-        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
-            ->once()->with($user->email,$this->contactFields)
-            ->andReturn([
-                ["Email"=> $user->email,
-                    "_Products"=>"ipa,iea",
-                    "Id"=> 1234]
-            ]);
-
-        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
-            ->once()
-            ->with(1234,112)
-            ->andReturn(true);
+        $this->initMockers($user,112);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)
             ->assertJson(['success'=>true]);
-
-
 
     }
 
@@ -138,20 +143,7 @@ class ModuleReminderAssignerTest extends TestCase
         $user->completed_modules()->attach($completedModuleIds);
 
 
-        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
-
-        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
-            ->once()->with($user->email,$this->contactFields)
-            ->andReturn([
-                ["Email"=> $user->email,
-                "_Products"=>"ipa,iea",
-                "Id"=> 1234]
-            ]);
-
-        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
-            ->once()
-            ->with(1234,116)
-            ->andReturn(true);
+        $this->initMockers($user,116);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)
@@ -176,20 +168,7 @@ class ModuleReminderAssignerTest extends TestCase
         $user = factory(\App\User::class)->create();
         $user->completed_modules()->attach($completedModuleIds);
 
-        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
-
-        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
-            ->once()->with($user->email,$this->contactFields)
-            ->andReturn([
-                ["Email"=> $user->email,
-                    "_Products"=>"ipa,iea",
-                    "Id"=> 1234]
-            ]);
-
-        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
-            ->once()
-            ->with(1234,120)
-            ->andReturn(true);
+        $this->initMockers($user,120);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)
@@ -214,20 +193,7 @@ class ModuleReminderAssignerTest extends TestCase
         $user->completed_modules()->attach($completedModuleIds);
 
 
-        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
-
-        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
-            ->once()->with($user->email,$this->contactFields)
-            ->andReturn([
-                ["Email"=> $user->email,
-                    "_Products"=>"ipa,iea",
-                    "Id"=> 1234]
-            ]);
-
-        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
-            ->once()
-            ->with(1234,122)
-            ->andReturn(true);
+        $this->initMockers($user,122);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)
@@ -253,20 +219,7 @@ class ModuleReminderAssignerTest extends TestCase
         $user->completed_modules()->attach($completedModuleIds);
 
 
-        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
-
-        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
-            ->once()->with($user->email,$this->contactFields)
-            ->andReturn([
-                ["Email"=> $user->email,
-                    "_Products"=>"ipa,iea",
-                    "Id"=> 1234]
-            ]);
-
-        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
-            ->once()
-            ->with(1234,124)
-            ->andReturn(true);
+        $this->initMockers($user,124);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)
@@ -295,22 +248,7 @@ class ModuleReminderAssignerTest extends TestCase
         $user->completed_modules()->attach($completedModuleIds);
 
 
-        InfusionsoftFacade::shouldReceive('setToken')->once()->andReturnNull();
-
-        InfusionsoftFacade::shouldReceive('contacts->findByEmail')
-            ->once()->with($user->email,$this->contactFields)
-            ->andReturn([
-                [
-                    "Email"=> $user->email,
-                    "_Products"=>"ipa,iea",
-                    "Id"=> 1234
-                ]
-            ]);
-
-        InfusionsoftFacade::shouldReceive('contacts->addToGroup')
-            ->once()
-            ->with(1234,126)
-            ->andReturn(true);
+        $this->initMockers($user,126);
 
         $this->post(route('module_reminder'),['contact_email'=>$user->email])
             ->assertStatus(201)

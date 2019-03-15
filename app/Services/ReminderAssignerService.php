@@ -29,6 +29,7 @@ class ReminderAssignerService
 
         //by default user has no pending module till one is found
         $nextModule = null;
+
         foreach ($contactCourses as $contactCourse ){
             $pendingModule = $user->getNextPendingModule($contactCourse);
             if($pendingModule){

@@ -64,9 +64,11 @@ class ModuleReminderAssignerTest extends TestCase
         InfusionsoftFacade::shouldReceive('contacts->findByEmail')
             ->once()->with($user->email,$this->contactFields)
             ->andReturn([
-                ["Email"=> $user->email,
+                [
+                    "Email"=> $user->email,
                     "_Products"=>"ipa,iea",
-                    "Id"=> 1234]
+                    "Id"=> 1234
+                ]
             ]);
 
         InfusionsoftFacade::shouldReceive('contacts->addToGroup')
@@ -106,6 +108,24 @@ class ModuleReminderAssignerTest extends TestCase
             ->assertJson(['success'=>false]);
     }
 
+    /**
+     * Test if endpoint will assign IPA Module 1 when user has zero completed modules
+     *
+     * @return  void
+     */
+
+    public function tests_will_assign_ipa_m1_when_zero()
+    {
+
+        $user = factory(\App\User::class)->create();
+
+        $this->initMockers($user,110);
+
+        $this->post(route('module_reminder'),['contact_email'=>$user->email])
+            ->assertStatus(201)
+            ->assertJson(['success'=>true]);
+
+    }
 
     /**
      * Test if endpoint will assign IPA Module 2 when user has completed IPA Module 1

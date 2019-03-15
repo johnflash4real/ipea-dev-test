@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
 use App\Services\TagService;
+use App\Services\ReminderAssignerService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -18,12 +19,19 @@ class ApiController extends Controller
 
     protected $tagService; //For everything tags
     protected $infusionSoftHelper;
+    protected $reminderAssignerService;
 
 
-    public function __construct(TagService $tagService, InfusionsoftHelper $infusionsoftHelper)
+    public function __construct(
+        TagService $tagService,
+        InfusionsoftHelper $infusionsoftHelper,
+        ReminderAssignerService $reminderAssignerService
+    )
+
     {
         $this->tagService = $tagService;
         $this->infusionSoftHelper = $infusionsoftHelper;
+        $this->reminderAssignerService = $reminderAssignerService;
     }
 
     /**
@@ -51,20 +59,11 @@ class ApiController extends Controller
         $user = User::where('email',$userEmail)->first();
         if(!$user) return response()->json(['success'=>false,'message'=>'user not found'],404);
 
-
         //get user's associated contact from infusion soft
-        $contact = $this->infusionSoftHelper->getContact($userEmail);
-        $contactCourses = explode(",",$contact['_Products']);
+        $contact = $this->infusionSoftHelper->getContact($user->email);
 
-        //by default user has no pending module till one is found
-        $nextModule = null;
-        foreach ($contactCourses as $contactCourse ){
-            $pendingModule = $user->getNextPendingModule($contactCourse);
-            if($pendingModule){
-                $nextModule = $pendingModule;
-                break; //stop looking any further once a pending module is found
-            }
-        }
+        //get user's next module based on contact data
+        $nextModule = $this->reminderAssignerService->getUserNextModule($user,$contact);
 
 
         //finally add the tag
